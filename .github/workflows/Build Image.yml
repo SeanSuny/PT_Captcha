@@ -1,0 +1,35 @@
+name: Build Image   # workflow名称，可以在Github项目主页的【Actions】中看到所有的workflow
+on:   # 配置触发workflow的事件
+  push:
+    paths-ignore:   # 排除路径
+      - 'docs**'
+      - 'images**'
+      - '**.md'
+      - '**.png'
+      - '**.json'
+      - 'LICENSE'
+    branches:   # main分支有push时触发此workflow
+      - 'main'
+    tags:       # tag更新时触发此workflow
+      - '*'
+jobs:  # workflow中的job
+  build:   # job的名字
+    name: Push Docker image to Docker Hub
+    runs-on: ubuntu-latest   # job运行的基础环境
+    steps:  # 一个job由一个或多个step组成
+      - name: Checkout the repo
+        uses: actions/checkout@main   # 官方的action，获取代码
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Build and push Docker image
+        uses: ilteoood/docker_buildx@master   # 三方的action操作， 执行docker镜像生成并推送到DockerHub
+        if: startsWith(github.repository, 'SeanSuny/PT_Captcha')
+        with:
+          publish: true
+          tag: latest   #Docker镜像标签
+          imageName: seansuny/pt_captcha   # Docker镜像名称
+          platform: linux/amd64,linux/arm64   # Docker准备构建的镜像平台
+          dockerUser: ${{ secrets.DOCKER_USERNAME }}   # DockerHub 的用户名
+          dockerPassword: ${{ secrets.DOCKER_TOKEN }}   # DockerHub 的Token
+          dockerFile: Dockerfile   #dockerfile文件的名称

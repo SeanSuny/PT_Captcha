@@ -1,0 +1,4 @@
+Flask==2.0.3
+Pillow==9.0.1
+requests==2.27.1
+tencentcloud_sdk_python_ocr==3.0.560
